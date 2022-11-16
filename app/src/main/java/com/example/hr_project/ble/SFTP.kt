@@ -2,8 +2,6 @@ package com.example.hr_project.ble
 
 import android.util.Log
 import com.jcraft.jsch.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException

@@ -21,8 +21,9 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.example.hr_project.*
 import com.example.hr_project.ble.BluetoothUtils
-import com.example.hr_project.ble.DataUtils
+import com.example.hr_project.ble.File
 import com.example.hr_project.ble.SFTP
+import com.example.hr_project.enums.FileType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -152,7 +153,10 @@ class MainActivity : Activity() {
             stopScan()
             disconnectGattServer()
 
-            if(DataUtils.get_file().isEmpty()) {
+            val files = File.files
+            File.files = mutableListOf()
+
+            if(files.isEmpty()) {
                 textview?.setText("file is empty.")
             }
             else{
@@ -175,11 +179,13 @@ class MainActivity : Activity() {
                             statusview?.setText("upload to server")
 
                             val dir = "/SFTP_folder"
-                            val head_name = DataUtils.get_file().first().name.substring(0,DataUtils.get_file().first().name.toString().lastIndexOf('_'))
-                            val tail_name = DataUtils.get_file().last().name.substring(DataUtils.get_file().last().name.toString().lastIndexOf('_'),DataUtils.get_file().last().name.toString().lastIndexOf('.'))
-                            val full_name = "$head_name$tail_name"
+                            val head_name = files.first().name.substring(0,files.first().name.toString().lastIndexOf('-'))
+                            val tail_name = files.last().name.substring(0,files.last().name.toString().lastIndexOf('-'))
+                            val full_name = "$head_name - $tail_name"
                             sftp.mkdir(dir,full_name)
-                            sftp.upload("$dir"+"/"+"$full_name", DataUtils.get_file())
+                            sftp.upload("$dir"+"/"+"$full_name", files)
+
+                            // TODO("delete local files")
                         }
                         job2.await()
 
@@ -508,91 +514,55 @@ class MainActivity : Activity() {
             }
         }
 
-        inner class File {
-            fun write(msg: String) {
-                if (!DataUtils.set_data(msg))
-                    DataUtils.create_file()
-            }
-        }
-
         /**
          * Log the value of the characteristic
          * @param characteristic
          */
         // Bluetooth 통신 읽기
-        private final val START_CHAR = 'A'
         var file: File? = null
 
+        @Synchronized
         private fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
             var msg = characteristic.getStringValue(0)
 
-            if(msg.contains("AFSAVE")){
-                write("NEXT")
-                Screen_Flag = 11
-            }
-            else if(msg.contains("ALLSAVE")){
-                write("NEXT")
-                Screen_Flag = 1
-            }
+            while (true) {
+                val index = msg.indexOf(FileType.FINISH_CHAR)
 
-            // data save
-            if(Screen_Flag == 1){
-                if(msg.contains("NEXT")) {
-                    msg = msg.substring(msg.indexOf("NEXT")+4)
-                    statusview?.setText("read data...")
-                    Log.i(TAG, "go NEXT file")
-                    Screen_Flag = 2
-                }
-                else if(msg.contains("REALFIN")) {
-                    Screen_Flag = 0
-                    statusview?.setText("Finish read data")
-                    Log.i(TAG, "All created")
-                }
-            }
-            if(Screen_Flag == 2){
-                if(!DataUtils.set_data(msg)) {
-                    statusview?.setText("Received 1 file")
-                    Log.i(TAG, "Receive 1 file")
-                    Screen_Flag = 3
-                }
-            }
-            if(Screen_Flag == 3){
-                statusview?.setText("file is created")
-                Log.i(TAG, "Create file")
-                DataUtils.create_file()
-                Screen_Flag = 4
-            }
-            if(Screen_Flag == 4) {
-                write("NEXT")
-                Screen_Flag = 1
-            }
+                if (index != -1) {
+                    write(msg.substring(0, index))
+                    close()
 
-            // AF Save
-            if(Screen_Flag == 11){
-                if(msg.contains("NEXT")) {
-                    msg = msg.substring(msg.indexOf("NEXT")+4)
-                    statusview?.setText("read data...")
-                    Log.i(TAG, "go NEXT file")
-                    Screen_Flag = 12
+                    msg = msg.substring(index + 1)
+                } else {
+                    write(msg)
+                    break
                 }
             }
-            if(Screen_Flag == 12){
-                if(!DataUtils.set_data(msg)) {
-                    statusview?.setText("Received 1 file")
-                    Log.i(TAG, "Receive 1 file")
-                    Screen_Flag = 13
+        }
+
+        private fun write(msg: String) {
+            try {
+                var writeMsg = msg
+
+                if (file == null) {
+                    file = File(FileType.startCharOf(msg[0]))
+                    writeMsg = msg.substring(1)
+
+                    Log.i(TAG, "create file ${file!!.getFileName()}")
                 }
-            }
-            if(Screen_Flag == 13){
-                statusview?.setText("file is created")
-                Log.i(TAG, "Create file")
-                DataUtils.create_file()
-                Screen_Flag = 0
-            }
 
-            // Receive Percent
-            textview?.setText("collect\n" + StringBuilder(txtRead).also { it.setCharAt(((DataUtils.get_datalength()%1000)/100),'▶')}.toString())
+                file!!.write(writeMsg)
+                textview?.setText("collect\n" + StringBuilder(txtRead).also { it.setCharAt((((file!!.getFileLength()%1000)/100).toInt()),'▶')}.toString())
+            } catch (exception: RuntimeException) {
+                exception.printStackTrace()
+                file = null
+            }
+        }
 
+        private fun close() {
+            file!!.close()
+            Log.i(TAG, "close file ${file!!.getFileName()}")
+            file = null
         }
     }
 
