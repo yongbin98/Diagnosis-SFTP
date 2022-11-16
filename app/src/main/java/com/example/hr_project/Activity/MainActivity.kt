@@ -180,7 +180,7 @@ class MainActivity : Activity() {
 
                             val dir = "/SFTP_folder"
                             val head_name = files.first().name.substring(0,files.first().name.toString().lastIndexOf('-'))
-                            val tail_name = files.last().name.substring(0,files.last().name.toString().lastIndexOf('-'))
+                            val tail_name = files.last().name.substring(files.last().name.toString().indexOf(' '),files.last().name.toString().lastIndexOf('-'))
                             val full_name = "$head_name - $tail_name"
                             sftp.mkdir(dir,full_name)
                             sftp.upload("$dir"+"/"+"$full_name", files)
@@ -189,7 +189,7 @@ class MainActivity : Activity() {
                         }
                         job2.await()
 
-                        val job3 = myCoroutinescope.async {
+                        myCoroutinescope.async {
                             statusview?.setText("upload is over")
                             sftp.disconnect()
                         }
