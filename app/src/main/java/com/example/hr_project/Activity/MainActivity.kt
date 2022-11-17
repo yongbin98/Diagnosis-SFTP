@@ -185,7 +185,9 @@ class MainActivity : Activity() {
                             sftp.mkdir(dir,full_name)
                             sftp.upload("$dir"+"/"+"$full_name", files)
 
-                            // TODO("delete local files")
+                            files.forEach { file ->
+                                file.delete()
+                            }
                         }
                         job2.await()
 
@@ -547,12 +549,12 @@ class MainActivity : Activity() {
                 if (file == null) {
                     file = File(FileType.startCharOf(msg[0]))
                     writeMsg = msg.substring(1)
-
+                    statusview?.setText("start data reading")
                     Log.i(TAG, "create file ${file!!.getFileName()}")
                 }
 
                 file!!.write(writeMsg)
-                textview?.setText("collect\n" + StringBuilder(txtRead).also { it.setCharAt((((file!!.getFileLength()%1000)/100).toInt()),'▶')}.toString())
+                textview?.setText("collect\n" + StringBuilder(txtRead).also { it.setCharAt((((file!!.getFileLength()%2000)/200).toInt()),'▶')}.toString())
             } catch (exception: RuntimeException) {
                 exception.printStackTrace()
                 file = null
@@ -562,6 +564,7 @@ class MainActivity : Activity() {
         private fun close() {
             file!!.close()
             Log.i(TAG, "close file ${file!!.getFileName()}")
+            statusview?.setText("file is created")
             file = null
         }
     }
@@ -603,6 +606,20 @@ class MainActivity : Activity() {
         }
         cmdCharacteristic.setValue(write_txt)
 
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
         val success: Boolean = bleGatt!!.writeCharacteristic(cmdCharacteristic)
 
         // check the result
