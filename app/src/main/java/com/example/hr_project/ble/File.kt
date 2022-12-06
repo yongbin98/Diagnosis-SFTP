@@ -37,4 +37,8 @@ class File(
         printWriter.close()
         files.add(file)
     }
+
+    fun delete(){
+        files.forEach { file-> file.delete() }
+    }
 }

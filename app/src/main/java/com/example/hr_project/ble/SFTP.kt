@@ -1,15 +1,16 @@
 package com.example.hr_project.ble
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.jcraft.jsch.*
-import java.io.File
+import kotlinx.coroutines.delay
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.UnknownHostException
 import java.util.*
 
-
+@SuppressLint("MissingPermission")
 class SFTP {
     //SFTP 설정
     private val TAG = "SFTP"
@@ -20,20 +21,18 @@ class SFTP {
     private val password = "69706970"
     private val port = 7140
     private val privateKey = null
+    companion object{
+        var isFinished:Boolean = false
+    }
 
     // 생성자
     init{
         var jSch : JSch = JSch()
         try {
-            if(privateKey!=null){
-                jSch.addIdentity(privateKey)
-            }
             session = jSch.getSession(userName,host,port)
-            if(privateKey==null){
-                session?.setPassword(password)
-            }
+            session?.setPassword(password)
             var config : Properties = Properties()
-            config.put("StrictHostKeyChecking","no")
+            config["StrictHostKeyChecking"] = "no"
             session?.setConfig(config)
         } catch (e: FileNotFoundException){
             // 파일 존재 x
@@ -54,6 +53,12 @@ class SFTP {
         }
     }
 
+    suspend fun bleFinished(){
+        while(!isFinished){
+            Log.i(TAG,"Wait BLE Fin")
+            delay(1000)
+        }
+    }
     // SFTP 서버 연결
     fun connect() {
         Log.i(TAG,"connecting....")
@@ -65,11 +70,13 @@ class SFTP {
     }
 
     // 디렉토리 생성
-    fun mkdir(dir:String,mkdirName:String)
+    private fun mkdir(dir:String)
     {
-        Log.i(TAG,"$dir , $mkdirName")
+        val directory = dir.substring(0,dir.lastIndexOf('/'))
+        val mkdirName = dir.substring(dir.lastIndexOf('/')+1)
+        Log.i(TAG,"$directory , $mkdirName")
         try {
-            channel?.cd(dir)
+            channel?.cd(directory)
             channel?.mkdir(mkdirName)
         } catch (e: SftpException) {
             e.printStackTrace()
@@ -79,13 +86,16 @@ class SFTP {
     }
 
     //파일 업로드
-    fun upload(dir:String, files:MutableList<File>) {
+    fun upload(files:MutableList<java.io.File>) {
+        val dir = getName(files)
+        mkdir(dir)
         Log.i(TAG,"uploading....")
         var filein: FileInputStream? = null
         try {
             channel?.cd(dir)
             for (file in files)
             {
+                Log.i(TAG,file.name)
                 filein = FileInputStream(file)
                 channel?.put(filein, file.name)
             }
@@ -102,6 +112,14 @@ class SFTP {
                 ex.printStackTrace()
             }
         }
+    }
+
+    private fun getName(files : MutableList<java.io.File>): String {
+        val dir = "/SFTP_folder"
+        val head_name = files.first().name.substring(0,files.first().name.toString().lastIndexOf('-'))
+        val tail_name = files.last().name.substring(files.last().name.toString().indexOf(' '),files.last().name.toString().lastIndexOf('-'))
+        val full_name = "$head_name - $tail_name"
+        return "$dir/$full_name"
     }
 
     fun disconnect(){
