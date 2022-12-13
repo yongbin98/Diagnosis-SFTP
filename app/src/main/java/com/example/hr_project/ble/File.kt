@@ -22,7 +22,7 @@ class File(
         val dateFormat = SimpleDateFormat("MM-dd HH:mm:ss")
         val date = dateFormat.format(Date(System.currentTimeMillis()))
 
-        return "${date}-${fileType.fileName}.txt"
+        return "${date}-${fileType.fileName}.csv"
     }
 
     fun getFileName(): String = file.name
@@ -36,5 +36,9 @@ class File(
     fun close() {
         printWriter.close()
         files.add(file)
+    }
+
+    fun delete(){
+        files.forEach { file-> file.delete() }
     }
 }
