@@ -95,10 +95,8 @@ class BluetoothCallback(
         characteristic: BluetoothGattCharacteristic
     ) {
         super.onCharacteristicChanged(gatt, characteristic)
-//            Log.d(TAG, "characteristic changed: " + characteristic.uuid.toString())
         reader(characteristic)
     }
-
     @Synchronized
     override fun onCharacteristicWrite(
         gatt: BluetoothGatt?,
@@ -114,7 +112,11 @@ class BluetoothCallback(
         }
     }
 
-    @Synchronized
+    /**
+     * Log the value of the characteristic
+     * @param characteristic
+     */
+    // Bluetooth 통신 읽기
     override fun onCharacteristicRead(
         gatt: BluetoothGatt?,
         characteristic: BluetoothGattCharacteristic,
@@ -131,13 +133,6 @@ class BluetoothCallback(
             // disconnectGattServer();
         }
     }
-
-    /**
-     * Log the value of the characteristic
-     * @param characteristic
-     */
-    // Bluetooth 통신 읽기
-
 
     /**
      * Disconnect Gatt Server

@@ -55,7 +55,7 @@ class SFTP {
 
     suspend fun bleFinished(){
         while(!isFinished){
-            Log.i(TAG,"Wait BLE Fin")
+            Log.i(TAG,"Wait data fifo")
             delay(1000)
         }
     }

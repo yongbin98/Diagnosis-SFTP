@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.os.Build
 import android.util.Log
+import com.example.hr_project.Activity.MainActivity
 import com.example.hr_project.enums.FileType
 import kotlinx.coroutines.delay
 
@@ -53,10 +54,11 @@ object BleService {
 
     fun disconnect() {
         Log.d(TAG, "Closing Gatt connection")
+        SFTP.isFinished = false
+        if(this::bleCallback.isInitialized)
+            bleCallback.isConnectionUpdated = false
 
         if (isConnected) {
-            SFTP.isFinished = false
-            bleCallback.isConnectionUpdated = false
             bleGatt.disconnect()
             bleGatt.close()
             file?.delete()
@@ -80,15 +82,16 @@ object BleService {
         val success: Boolean = bleGatt.writeCharacteristic(cmdCharacteristic)
 
         // check the result
-        if (!success) {
+        while(!success){
             Log.e(TAG, "Failed to write command")
-            return
         }
     }
 
     @Synchronized
     fun readFromBluetooth(characteristic: BluetoothGattCharacteristic) {
         var msg = characteristic.getStringValue(0)
+        Log.i(TAG,msg)
+
         var index = msg.indexOf(FileType.FINISH_CHAR)
 
         if(index != -1) {

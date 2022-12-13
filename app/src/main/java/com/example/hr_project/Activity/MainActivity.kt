@@ -27,10 +27,7 @@ import com.example.hr_project.ble.BluetoothUtils
 import com.example.hr_project.ble.File
 import com.example.hr_project.ble.SFTP
 import com.example.hr_project.enums.FileType
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 
 @SuppressLint("MissingPermission")
@@ -41,10 +38,14 @@ class MainActivity : AppCompatActivity() {
     private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE) {
         bleManager?.adapter
     }
+
+    companion object{
+        var statusview:TextView? = null
+    }
     private val TAG = "Central"
     private var textview:TextView? = null
-    private var statusview:TextView? = null
     private val myCoroutinescope = CoroutineScope(Dispatchers.IO)
+    private lateinit var job : Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,9 +56,8 @@ class MainActivity : AppCompatActivity() {
         textview = findViewById(R.id.textView)
 
         startbtn.setOnClickListener {
-            textview?.text = "wait for connect"
-
-            myCoroutinescope.launch {
+            job = myCoroutinescope.launch {
+                textview?.text = "wait for connect"
                 BleService.connect(this@MainActivity)
                 statusview?.text = "Find Characteristic"
                 BleService.isbleUpdated()
@@ -66,8 +66,10 @@ class MainActivity : AppCompatActivity() {
 
                 val sftp = SFTP()
                 sftp.bleFinished()
+                statusview?.text = "upload to server"
                 sftp.connect()
                 sftp.upload(File.files)
+                statusview?.text = "files are uploaded"
                 sftp.disconnect()
                 BleService.disconnect()
             }
@@ -76,6 +78,8 @@ class MainActivity : AppCompatActivity() {
             // stop button click
             textview?.text = "Disconnect"
             BleService.disconnect()
+            if(this::job.isInitialized)
+                job.cancel()
         }
     }
 }
