@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object{
-        var statusview:TextView? = null
+        var textview:TextView? = null
     }
     private val TAG = "Central"
     private var textview:TextView? = null
@@ -57,26 +57,28 @@ class MainActivity : AppCompatActivity() {
 
         startbtn.setOnClickListener {
             job = myCoroutinescope.launch {
-                textview?.text = "wait for connect"
+                textview?.text = "Start scanning the device"
                 BleService.connect(this@MainActivity)
-                statusview?.text = "Find Characteristic"
+                textview?.text = "Wait for connection update"
                 BleService.isbleUpdated()
-                statusview?.text = "Connected!!"
+                textview?.text = "Connected!!"
                 BleService.write("SCS\n")
 
                 val sftp = SFTP()
+                textview?.text = "data is being read from the device"
                 sftp.bleFinished()
-                statusview?.text = "upload to server"
+                textview?.text = "All data has benn read\nstart connecting to server"
                 sftp.connect()
+                textview?.text = "start uploading to server"
                 sftp.upload(File.files)
-                statusview?.text = "files are uploaded"
+                textview?.text = "files are uploaded"
                 sftp.disconnect()
                 BleService.disconnect()
             }
         }
         stopbtn.setOnClickListener {
             // stop button click
-            textview?.text = "Disconnect"
+            textview?.text = "Disconnect button pressed"
             BleService.disconnect()
             if(this::job.isInitialized)
                 job.cancel()

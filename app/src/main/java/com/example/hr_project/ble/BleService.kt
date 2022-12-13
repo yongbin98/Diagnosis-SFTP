@@ -47,7 +47,6 @@ object BleService {
         bleRepository.connectBLE()
 
         while (!isConnected) {
-            Log.d(TAG,"not Connected")
             delay(1000)
         }
     }
@@ -90,7 +89,6 @@ object BleService {
     @Synchronized
     fun readFromBluetooth(characteristic: BluetoothGattCharacteristic) {
         var msg = characteristic.getStringValue(0)
-        Log.i(TAG,msg)
 
         var index = msg.indexOf(FileType.FINISH_CHAR)
 

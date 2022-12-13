@@ -10,7 +10,7 @@
         android:id="@+id/textView"
         android:layout_width="329dp"
         android:layout_height="53dp"
-        android:text="Default MAC : \n EB:1F:68:DE:E7:B1"
+        android:text="Please press the connect button\nMAC : EB:1F:68:DE:E7:B1"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="20dp"
@@ -19,23 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.1" />
-
-    <EditText
-        android:id="@+id/name"
-        android:layout_width="257dp"
-        android:layout_height="81dp"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Write bluetooth name"
-        android:textAlignment="center"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.031" />
+        app:layout_constraintVertical_bias="0.168" />
 
     <Button
         android:id="@+id/StartScan"
@@ -46,7 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.415" />
+        app:layout_constraintVertical_bias="0.395" />
 
     <Button
         android:id="@+id/StopScan"
