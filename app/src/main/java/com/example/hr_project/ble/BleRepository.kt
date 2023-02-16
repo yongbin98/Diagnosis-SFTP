@@ -11,9 +11,7 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.util.Log
-import com.example.hr_project.PERMISSIONS
-import com.example.hr_project.REQUEST_ALL_PERMISSION
-import com.example.hr_project.SERVICE_MAC_ADDRESS
+import com.example.hr_project.*
 
 @SuppressLint("MissingPermission")
 class BleRepository(
@@ -28,10 +26,6 @@ class BleRepository(
     private val scanResults = mutableSetOf<BluetoothDevice>()
     private val bleScanCallback: ScanCallback = BLEScanCallback(this::addScanResult)
     private val TAG = "bleRepository"
-
-    init {
-        activity.requestPermissions(PERMISSIONS, REQUEST_ALL_PERMISSION)
-    }
 
     fun connectBLE() {
         scanResults.clear()
@@ -52,6 +46,18 @@ class BleRepository(
             .setDeviceAddress(SERVICE_MAC_ADDRESS)
             .build()
         filters.add(scanFilter)
+        val scanFilter2: ScanFilter = ScanFilter.Builder()
+//            .setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_STRING))) // UUID로 검색
+//            .setDeviceName("Rehab01")
+            .setDeviceAddress(SERVICE_MAC_ADDRESS_2)
+            .build()
+        filters.add(scanFilter2)
+        val scanFilter3: ScanFilter = ScanFilter.Builder()
+//            .setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_STRING))) // UUID로 검색
+//            .setDeviceName("Rehab01")
+            .setDeviceAddress(SERVICE_MAC_ADDRESS_3)
+            .build()
+        filters.add(scanFilter3)
 
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
