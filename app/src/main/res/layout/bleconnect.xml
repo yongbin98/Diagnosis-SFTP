@@ -8,57 +8,58 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="329dp"
-        android:layout_height="53dp"
-        android:text="Default MAC : \n EB:1F:68:DE:E7:B1"
+        android:layout_width="336dp"
+        android:layout_height="95dp"
+        android:layout_marginStart="38dp"
+
+        android:layout_marginTop="113dp"
+        android:layout_marginEnd="38dp"
+        android:layout_marginBottom="55dp"
+        android:text="Please press the connect button"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="20dp"
-
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.1" />
-
-    <EditText
-        android:id="@+id/name"
-        android:layout_width="257dp"
-        android:layout_height="81dp"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Write bluetooth name"
-        android:textAlignment="center"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.031" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/StartScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="64dp"
         android:text="Connect"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.415" />
+        app:layout_constraintBottom_toTopOf="@+id/StopScan"
+        app:layout_constraintEnd_toEndOf="@+id/StopScan"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
     <Button
         android:id="@+id/StopScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="230dp"
         android:text="Disconnect"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.559" />
+        app:layout_constraintTop_toBottomOf="@+id/StartScan" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="324dp"
+        android:layout_height="53dp"
+        android:layout_marginBottom="69dp"
+        android:max="100"
+        android:progress="0"
+        android:scaleY="7"
+        android:scaleX="1"
+        app:layout_constraintBottom_toTopOf="@+id/StartScan"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

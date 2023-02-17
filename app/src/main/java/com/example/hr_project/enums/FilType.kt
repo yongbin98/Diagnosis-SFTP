@@ -11,9 +11,11 @@ enum class FileType(val startChar: Char, val fileName: String) {
     companion object {
         const val NEXT_CHAR = 'N'
         const val FINISH_CHAR = 'F'
+        const val FOLDER_CHAR = 'O'
+        const val FILE_CHAR = 'L'
 
         fun startCharOf(startChar: Char): FileType{
-            return values().find { it.startChar == startChar }!! // ?: throw RuntimeException("Not Found File Type")
+            return values().find { it.startChar == startChar } ?: throw RuntimeException("Not Found File Type")
         }
 
     }

@@ -2,6 +2,7 @@ package com.example.hr_project.ble
 
 import android.annotation.SuppressLint
 import android.util.Log
+import com.example.hr_project.Activity.MainActivity
 import com.jcraft.jsch.*
 import kotlinx.coroutines.delay
 import java.io.FileInputStream
@@ -53,12 +54,6 @@ class SFTP {
         }
     }
 
-    suspend fun bleFinished(){
-        while(!isFinished){
-            Log.i(TAG,"Wait data fifo")
-            delay(1000)
-        }
-    }
     // SFTP 서버 연결
     fun connect() {
         Log.i(TAG,"connecting....")
